@@ -6,21 +6,23 @@ import org.openqa.selenium.WebDriver;
 public class LoginPage {
     private WebDriver driver;
 
-    // Localizadores
+    // Localizadores (Parte 1)
     private By userField = By.id("user-name");
     private By passField = By.id("password");
     private By loginBtn = By.id("login-button");
     private By errorMessage = By.cssSelector("[data-test='error']");
 
-    // Constructor
     public LoginPage(WebDriver driver) {
         this.driver = driver;
     }
 
-    // Acciones
-    public void ingresarCredenciales(String user, String pass) {
+    // Acciones individuales
+    public void ingresarUsuario(String user) {
         driver.findElement(userField).clear();
         driver.findElement(userField).sendKeys(user);
+    }
+
+    public void ingresarPassword(String pass) {
         driver.findElement(passField).clear();
         driver.findElement(passField).sendKeys(pass);
     }
@@ -29,16 +31,14 @@ public class LoginPage {
         driver.findElement(loginBtn).click();
     }
 
+
     public void login(String user, String pass) {
-        ingresarCredenciales(user, pass);
+        ingresarUsuario(user);
+        ingresarPassword(pass);
         clickLogin();
     }
 
-    // Verificaciones
-    public String obtenerTituloPagina() {
-        return driver.getTitle();
-    }
-
+    // Métodos de ayuda para las verificaciones
     public String obtenerUrlActual() {
         return driver.getCurrentUrl();
     }
@@ -48,9 +48,15 @@ public class LoginPage {
     }
 
     public String obtenerTextoError() {
-        if (errorVisible()) {
-            return driver.findElement(errorMessage).getText();
+        return errorVisible() ? driver.findElement(errorMessage).getText() : "";
+    }
+
+    // Método interno para no repetir el try-catch de las pausas
+    private void pausa(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return "";
     }
 }

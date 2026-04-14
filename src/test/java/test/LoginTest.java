@@ -1,9 +1,7 @@
 package test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import pages.LoginPage;
@@ -20,9 +18,7 @@ public class LoginTest {
                 WebDriverManager.chromedriver().setup();
                 driver = new ChromeDriver();
                 driver.manage().window().maximize();
-
                 driver.get("https://www.saucedemo.com/");
-
                 loginPage = new LoginPage(driver);
         }
 
@@ -34,23 +30,30 @@ public class LoginTest {
         }
 
         @Test
-        void loginCorrecto() {
-                loginPage.login("standard_user", "secret_sauce");
+        @DisplayName("Prueba de Login Correcto")
+        void loginCorrecto() throws InterruptedException {
+                loginPage.ingresarUsuario("standard_user");
+                Thread.sleep(1000); // Pausa entre acciones como pide la Parte 4
 
-                String urlActual = loginPage.obtenerUrlActual();
+                loginPage.ingresarPassword("secret_sauce");
+                Thread.sleep(1000);
 
-                assertTrue(urlActual.contains("inventory"),
-                        "El usuario debería entrar a la página de inventario tras un login correcto");
+                loginPage.clickLogin();
+                Thread.sleep(2000); // Pausa para ver el resultado final
+
+                assertTrue(loginPage.obtenerUrlActual().contains("inventory"));
         }
 
         @Test
-        void loginIncorrecto() {
-                loginPage.login("standard_user", "clave_mal");
+        @DisplayName("Prueba de Login con datos incorrectos")
+        void loginIncorrecto() throws InterruptedException {
 
-                assertTrue(loginPage.errorVisible(),
-                        "Debería mostrarse un mensaje de error al fallar el login");
+                loginPage.login("standard_user", "clave_incorrecta");
 
+                Thread.sleep(2000);
+
+                assertTrue(loginPage.errorVisible(), "ERROR: El mensaje de error debería ser visible.");
                 assertTrue(loginPage.obtenerTextoError().contains("Username and password do not match"),
-                        "El mensaje de error no es el esperado");
+                        "ERROR: El mensaje de error no es el esperado.");
         }
 }
